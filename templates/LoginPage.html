@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("static/bg.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .login-box {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            margin: 200px auto;
+            text-align: center;
+        }
+        img{
+            width: 250px;
+            height: 80px;
+        }
+    </style>
+</head>
+<nav class="navbar navbar-light bg-light">
+    <img class="logo" src="static/logo.png" alt="logo">
+    <a class="navbar-brand" href="#">CSIS department</a>
+</nav>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 offset-md-4 login-box">
+                <h2>Login</h2>
+                    <a href="{{ url_for('login') }}">
+                    <button class="btn btn-primary btn-block" >Login with Google</button>
+                    </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
