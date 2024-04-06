@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, request
 from forms import LoginForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
+from io import BytesIO
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -13,13 +15,13 @@ db.init_app(app)
 
 
 class USER_DETAIL(db.Model):
-    _tablename_ = "user_detail"
+    __tablename__ = "user_detail"
     email = db.Column(db.String(120), unique=True, nullable=False, primary_key=True)
     roles = db.Column(db.String(120), nullable=False)
 
 
 class JOURNALS(db.Model):
-    _tablename_ = "journals"
+    __tablename__ = "journals"
     j_email = db.Column(db.String(120), nullable=False)
     j_dop = db.Column(db.String(20), nullable=False)
     j_nat_inat = db.Column(db.String(120), nullable=False)
@@ -38,9 +40,9 @@ class JOURNALS(db.Model):
 
 
 class CONFERENCE(db.Model):
-    _tablename_ = "conference"
+    __tablename__ = "conference"
     c_email = db.Column(db.String(120), nullable=False)
-    c_date = db.Column(db.Integer, nullable=False)
+    c_date = db.Column(db.Integer, primary_key=True)
     c_nat = db.Column(db.String(120), nullable=False)
     c_corerank = db.Column(db.Integer, nullable=False)
     c_pap_tit = db.Column(db.String(120), nullable=False)
@@ -71,11 +73,20 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         # Process the form data here
-        the_user = USER_DETAIL.query.filter_by(email=form.email.data).first()
-        
+        the_user = USER_DETAIL.query.filter_by(email = form.email.data).first()
+
+        if the_user:
+
+            if the_user.roles == 'admin':
+                return redirect(url_for('admin_page'))
+            
+            else:
+                return redirect(url_for('home_page'))
 
         
+        else:
 
+            return redirect(url_for('unauthorized'))
 
         # print(form.email.data)
         # print(form.password.data)
@@ -86,7 +97,7 @@ def login():
         # if admin then pass then
         # return redirect(url_for('admin_page'))
         # else
-        return redirect(url_for('home_page'))
+        
         # else add the user in the database----------ye alag se function hoga...
         # else show unauthorised access
     return render_template('login.html', form=form)
@@ -109,10 +120,7 @@ def admin_pub_page():
 
 @app.route('/entries')
 def entries():
-    journals = JOURNALS.query.all()
-    conferences = CONFERENCE.query.all()
-
-    return render_template("EntriesPage.html", journals=journals, conferences=conferences)
+    return render_template("EntriesPage.html")
 
 
 @app.route('/publication', methods=['GET', 'POST'])
@@ -183,7 +191,7 @@ def journal_page():
 
         # Commit the changes to persist them in the database
         db.session.commit()
-        return "<h1>Entry done</h1>"
+        return redirect(url_for('home_page'))
     return render_template("JournalPage.html")
 
 
@@ -227,7 +235,7 @@ def conference():
 
         # Commit the session to persist the changes
         db.session.commit()
-        return "<h1>Confrerece entry done</h1>"
+        return redirect(url_for('home_page'))
     return render_template("ConferencePage.html")
 
 
@@ -235,15 +243,7 @@ def conference():
 def pub_edit_page():
     return render_template("PublicationEditPage.html")
 
-@app.route('/show_entry/<string:journal_doi>')
-def show_entry(journal_doi):
-    journal = JOURNALS.query.get(journal_doi)
-    return render_template("ShowJournalPage.html", journal = journal)
 
-@app.route('/show_conf_entry/<string:conf_url>')
-def show_conf_entry(conf_url):
-    conference = CONFERENCE.query.get(conf_url)
-    return render_template("ShowConferencePage.html", conference = conference)
 
 
 if __name__ == "__main__":
