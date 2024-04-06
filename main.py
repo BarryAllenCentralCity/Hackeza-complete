@@ -1,3 +1,5 @@
+import smtplib
+
 from flask import Flask, render_template, redirect, url_for, request
 from forms import LoginForm
 from flask_sqlalchemy import SQLAlchemy
@@ -12,6 +14,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///our_data.db"
 db.init_app(app)
 
 login_id = ""
+MY_EMAIL = "44bantai@gmail.com"
+PASSWORD = "vsmqcdoteyqchkwq"
 
 
 class USER_DETAIL(db.Model):
@@ -36,7 +40,7 @@ class JOURNALS(db.Model):
     j_issue = db.Column(db.String(120), nullable=False)
     j_page_n = db.Column(db.String(120), nullable=False)
     j_publisher = db.Column(db.String(120), nullable=False)
-    # j_con_loc = db.Column(db.String(120), nullable=False)
+    j_con_loc = db.Column(db.String(120), nullable=False)
 
 
 class CONFERENCE(db.Model):
@@ -73,9 +77,23 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         # Process the form data here
-        print(form.email.data)
-        login_id = form.email.data
-        print(form.password.data)
+        the_user = USER_DETAIL.query.filter_by(email=form.email.data).first()
+
+        if the_user:
+
+            if the_user.roles == 'admin':
+                return redirect(url_for('admin_page'))
+
+            else:
+                return redirect(url_for('home_page'))
+
+
+        else:
+
+            return redirect(url_for('unauthorized'))
+
+        # print(form.email.data)
+        # print(form.password.data)
 
         ##check in the data base##
 
@@ -83,7 +101,7 @@ def login():
         # if admin then pass then
         # return redirect(url_for('admin_page'))
         # else
-        return redirect(url_for('home_page'))
+
         # else add the user in the database----------ye alag se function hoga...
         # else show unauthorised access
     return render_template('login.html', form=form)
@@ -174,7 +192,7 @@ def journal_page():
             j_issue=issue,
             j_page_n=page_numbers,
             j_publisher=publisher,
-            # j_con_loc=conference_location
+            j_con_loc=conference_location
         )
 
         # Add the new_journal to the database session
@@ -230,7 +248,6 @@ def conference():
     return render_template("ConferencePage.html", conference=None, IsEdit=False)
 
 
-
 @app.route('/show_entry/<string:journal_doi>')
 def show_entry(journal_doi):
     journal = JOURNALS.query.get(journal_doi)
@@ -263,7 +280,7 @@ def edit_journal(journal_doi):
 
         # Commit the changes to the database
         db.session.commit()
-        return "<h1>EDIT hogya</h1>"
+        return redirect(url_for('admin_pub_page'))
     return render_template("JournalPage.html", journal=journal, IsEdit=True)
 
 
@@ -289,7 +306,7 @@ def edit_conference(conf_url):
 
         # Commit the changes to the database
         db.session.commit()
-        return "<h1>EDITED CONFERENCES!!!!!!</h1>"
+        return redirect(url_for('admin_pub_page'))
 
     return render_template("ConferencePage.html", conference=conference, IsEdit=True)
 
@@ -299,7 +316,7 @@ def delete_conference(conf_url):
     conference = CONFERENCE.query.get(conf_url)
     db.session.delete(conference)
     db.session.commit()
-    return render_template("Entries.html", journals=JOURNALS.query.all(), conferences=CONFERENCE.query.all())
+    return redirect(url_for('entries'))
 
 
 @app.route('/delete_journal/<string:journal_doi>')
@@ -308,6 +325,23 @@ def delete_journal(journal_doi):
     db.session.delete(journal)
     db.session.commit()
     return redirect(url_for('entries'))
+
+
+@app.route('/send_mail')
+def send_email():
+    all_users = []
+    total_users = USER_DETAIL.query.all()
+    for user in total_users:
+        if user.roles != 'admin':
+            print(user.email)
+            all_users.append(user.email)
+    with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+        connection.starttls()
+        connection.login(user=MY_EMAIL, password=PASSWORD)
+        for email in all_users:
+            connection.sendmail(from_addr=MY_EMAIL, to_addrs=email,
+                                msg=f"Subject:Regarding Journal or Conference Entry.\n\nPlease complete your entry in the portal to the earliest.")
+    return redirect(url_for('admin_page'))
 
 
 if __name__ == "__main__":
