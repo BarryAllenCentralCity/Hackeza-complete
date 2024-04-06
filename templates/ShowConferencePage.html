@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Conference Details</title>
+    <style>
+        #button {
+            margin-top: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conference Details</h1>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>Date</th>
+                    <td>{{conference.c_date}}</td>
+                </tr>
+                <tr>
+                    <th>National/International</th>
+                    <td>{{conference.c_nat}}</td>
+                </tr>
+                <tr>
+                    <th>Corerank</th>
+                    <td>{{conference.c_corerank}}</td>
+                </tr>
+                <tr>
+                    <th>Paper Title</th>
+                    <td>{{conference.c_pap_tit}}</td>
+                </tr>
+                <tr>
+                    <th>Shortname</th>
+                    <td>{{conference.c_short_name}}</td>
+                </tr>
+                <tr>
+                    <th>Fullname</th>
+                    <td>{{conference.c_full_name}}</td>
+                </tr>
+                <tr>
+                    <th>Conference Location</th>
+                    <td>{{conference.c_con_location}}</td>
+                </tr>
+                <tr>
+                    <th>Volume</th>
+                    <td>{{conference.c_volume}}</td>
+                </tr>
+                <tr>
+                    <th>Issue</th>
+                    <td>{{conference.c_issue}}</td>
+                </tr>
+                <tr>
+                    <th>Page numbers</th>
+                    <td>{{conference.c_page_n}}</td>
+                </tr>
+                <tr>
+                    <th>URL</th>
+                    <td>{{conference.c_url}}</td>
+                </tr>
+                <tr>
+                    <th>Publisher</th>
+                    <td>{{conference.c_publisher}}</td>
+                </tr>
+                <tr>
+                    <th>Authors</th>
+                    <td>{{conference.c_authors}}</td>
+                </tr>
+                <!-- Add more rows for additional conference details -->
+            </tbody>
+        </table>
+        <div id="button" class="row">
+            <div class="col">
+                <button style="margin-right: 10px; width:15%" class="btn btn-primary">Edit</button>
+                <button style="width: 15%;" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
