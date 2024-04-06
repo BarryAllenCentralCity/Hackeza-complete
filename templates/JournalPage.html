@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Journal Page</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <style>
+    body {
+        background-image: url("static/bg.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .logo {
+        width: 250px;
+        height: 80px;
+    }
+
+    .container {
+        width: 60%;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 5px;
+        margin: 50px auto;
+    }
+
+    input[type="submit"] {
+            display: block;
+            padding: 10px 20px;
+            width: 70%;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            margin-left: auto; /* Add this line to center align the buttons horizontally */
+            margin-right: auto; /* Add this line to center align the buttons horizontally */
+        }
+
+        label {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        /* END: Custom Styles */
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="HomePage.html"><img class="logo" src="static/logo.png" alt="logo"></a>
+        <a class="navbar-brand" href="#">CSIS department</a>
+    </nav>
+    
+    <div class = "container">
+        
+        <section id="journal-section">
+            <form action="/journal" method="post">
+                <h1 style="text-align: center;">Journal Details</h1>
+                <div class="form-group">
+                    <label for="publication-date">Date of Publication:</label>
+                    <input type="date" id="publication-date" name="publication-date" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="national-international">National/International:</label>
+                    <select id="national-international" name="national-international" class="form-control">
+                        <option value="national">National</option>
+                        <option value="international">International</option>
+                    </select><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="ranking">Ranking:</label>
+                    <input type="text" id="ranking" name="ranking" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="broad-area">Broad Area:</label>
+                    <input type="text" id="broad-area" name="broad-area" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="paper-title">Title of the Paper:</label>
+                    <input type="text" id="paper-title" name="paper-title" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="conference-name">Conference Name (if applicable):</label>
+                    <input type="text" id="conference-name" name="conference-name" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="impact-factor">Impact Factor:</label>
+                    <input type="text" id="impact-factor" name="impact-factor" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="conference-location">Conference Location:</label>
+                    <input type="text" id="conference-location" name="conference-location" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="volume">Volume:</label>
+                    <input type="text" id="volume" name="volume" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="issue">Issue:</label>
+                    <input type="text" id="issue" name="issue" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="page-numbers">Page Numbers:</label>
+                    <input type="text" id="page-numbers" name="page-numbers" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="doi">DOI:</label>
+                    <input type="text" id="doi" name="doi" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="publisher">Publisher:</label>
+                    <input type="text" id="publisher" name="publisher" class="form-control"><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="authors">Authors:</label>
+                    <textarea id="authors" name="authors" class="form-control"></textarea><br>
+                </div>
+                
+                <input type="submit" class="btn btn-primary" value="SAVE">
+            </form>
+        </section>
+    </div>
+    
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
