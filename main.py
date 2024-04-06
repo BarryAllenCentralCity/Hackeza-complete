@@ -13,6 +13,8 @@ db = SQLAlchemy()
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///our_data.db"
 db.init_app(app)
 
+login_id = ""
+
 
 class USER_DETAIL(db.Model):
     __tablename__ = "user_detail"
@@ -42,7 +44,7 @@ class JOURNALS(db.Model):
 class CONFERENCE(db.Model):
     __tablename__ = "conference"
     c_email = db.Column(db.String(120), nullable=False)
-    c_date = db.Column(db.Integer, primary_key=True)
+    c_date = db.Column(db.Integer, nullable=False)
     c_nat = db.Column(db.String(120), nullable=False)
     c_corerank = db.Column(db.Integer, nullable=False)
     c_pap_tit = db.Column(db.String(120), nullable=False)
@@ -73,6 +75,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         # Process the form data here
+        # print(form.email.data)
+        login_id = form.email.data
+        # print(form.password.data)
         the_user = USER_DETAIL.query.filter_by(email = form.email.data).first()
 
         if the_user:
@@ -87,17 +92,13 @@ def login():
         else:
 
             return redirect(url_for('unauthorized'))
-
-        # print(form.email.data)
-        # print(form.password.data)
-
         ##check in the data base##
 
         # if passed then the next line
         # if admin then pass then
         # return redirect(url_for('admin_page'))
         # else
-        
+        # return redirect(url_for('home_page'))
         # else add the user in the database----------ye alag se function hoga...
         # else show unauthorised access
     return render_template('login.html', form=form)
@@ -110,6 +111,10 @@ def home_page():
 
 @app.route('/admin')
 def admin_page():
+    # taking in all the journal entries
+
+    ##
+
     return render_template("AdminPage.html")
 
 
@@ -120,7 +125,25 @@ def admin_pub_page():
 
 @app.route('/entries')
 def entries():
-    return render_template("EntriesPage.html")
+    journals = JOURNALS.query.all()
+    if journals:
+        for journal in journals:
+            print(journal.j_email)
+            print(journal.j_con_name)
+    else:
+        print("NOTHING HERE")
+    #####
+
+    # taking in all the conference entries
+
+    conferences = CONFERENCE.query.all()
+    if conferences:
+        for conference in conferences:
+            print(conference.c_email)
+            print(conference.c_nat)
+    else:
+        print("nothing here")
+    return render_template("EntriesPage.html", journals=journals, conferences=conferences)
 
 
 @app.route('/publication', methods=['GET', 'POST'])
@@ -150,26 +173,9 @@ def journal_page():
         doi = request.form['doi']
         publisher = request.form['publisher']
         authors = request.form['authors']
-        
 
-        # Process the form data here, you can save it to database or perform other actions
-        # For now, let's just print the values
-        # print(f"Publication Date: {publication_date}")
-        # print(f"National/International: {national_international}")
-        # print(f"Ranking: {ranking}")
-        # print(f"Broad Area: {broad_area}")
-        # print(f"Paper Title: {paper_title}")
-        # print(f"Conference Name: {conference_name}")
-        # print(f"Impact Factor: {impact_factor}")
-        # print(f"Conference Location: {conference_location}")
-        # print(f"Volume: {volume}")
-        # print(f"Issue: {issue}")
-        # print(f"Page Numbers: {page_numbers}")
-        # print(f"DOI: {doi}")
-        # print(f"Publisher: {publisher}")
-        # print(f"Authors: {authors}")
         new_journal = JOURNALS(
-            j_email="j_email",
+            j_email=login_id,
             j_dop=publication_date,
             j_nat_inat=national_international,
             j_ranking=ranking,
@@ -183,7 +189,7 @@ def journal_page():
             j_issue=issue,
             j_page_n=page_numbers,
             j_publisher=publisher,
-            j_con_loc = conference_location
+            # j_con_loc=conference_location
         )
 
         # Add the new_journal to the database session
@@ -191,15 +197,15 @@ def journal_page():
 
         # Commit the changes to persist them in the database
         db.session.commit()
-        return redirect(url_for('home_page'))
-    return render_template("JournalPage.html")
+        return redirect(url_for('login'))
+    return render_template("JournalPage.html", journal=None, IsEdit=False)
 
 
 @app.route('/conference', methods=["GET", "POST"])
 def conference():
-    if request.method == "POST":
+    if request.method == 'POST':
         # Extract form data
-        c_email = "c_mail"
+        c_email = "maillll"
         c_date = request.form['conference-date']
         c_nat = request.form['type']
         c_corerank = request.form['corerank']
@@ -236,14 +242,87 @@ def conference():
         # Commit the session to persist the changes
         db.session.commit()
         return redirect(url_for('home_page'))
-    return render_template("ConferencePage.html")
+    return render_template("ConferencePage.html", conference=None, IsEdit=False)
 
 
-@app.route('/publication_edit')
-def pub_edit_page():
-    return render_template("PublicationEditPage.html")
+
+@app.route('/show_entry/<string:journal_doi>')
+def show_entry(journal_doi):
+    journal = JOURNALS.query.get(journal_doi)
+    return render_template("ShowJournalPage.html", journal=journal)
 
 
+@app.route('/show_conf_entry/<string:conf_url>')
+def show_conf_entry(conf_url):
+    conference = CONFERENCE.query.get(conf_url)
+    return render_template("ShowConferencePage.html", conference=conference)
+
+
+@app.route('/edit_journal/<string:journal_doi>', methods=['GET', 'POST'])
+def edit_journal(journal_doi):
+    journal = JOURNALS.query.get(journal_doi)
+    # return "<h1>EDIT ME AAGYE</h1>"
+    if request.method == 'POST':
+        journal.j_dop = request.form['publication-date']
+        journal.j_nat_inat = request.form['national-international']
+        journal.j_ranking = request.form['ranking']
+        journal.j_broad_area = request.form['broad-area']
+        journal.j_pap_tit = request.form['paper-title']
+        journal.j_con_name = request.form['conference-name']
+        journal.j_impf = request.form['impact-factor']
+        journal.j_volume = request.form['volume']
+        journal.j_issue = request.form['issue']
+        journal.j_page_n = request.form['page-numbers']
+        journal.j_publisher = request.form['publisher']
+        journal.j_authors = request.form['authors']
+
+        # Commit the changes to the database
+        db.session.commit()
+        return redirect(url_for('admin_pub_page'))
+    return render_template("JournalPage.html", journal=journal, IsEdit=True)
+
+
+@app.route('/edit_conference/<string:conf_url>', methods=['GET', 'POST'])
+def edit_conference(conf_url):
+    conference = CONFERENCE.query.get(conf_url)
+    # return "<h1>EDIT ME AAGYE</h1>"
+    if request.method == 'POST':
+        conference.c_email = "maillll"
+        conference.c_date = request.form['conference-date']
+        conference.c_nat = request.form['type']
+        conference.c_corerank = request.form['corerank']
+        conference.c_pap_tit = request.form['title']
+        conference.c_short_name = request.form['shortname']
+        conference.c_con_location = request.form['location']
+        conference.c_full_name = request.form['fullname']
+        conference.c_url = request.form['url']
+        conference.c_authors = request.form['authors']
+        conference.c_volume = request.form['volume']
+        conference.c_issue = request.form['issue']
+        conference.c_page_n = request.form['pages']
+        conference.c_publisher = request.form['publisher']
+
+        # Commit the changes to the database
+        db.session.commit()
+        return redirect(url_for('admin_pub_page'))
+    return render_template("ConferencePage.html", conference=conference, IsEdit=True)
+
+
+@app.route('/delete_conference/<string:conf_url>')
+def delete_conference(conf_url):
+    conference = CONFERENCE.query.get(conf_url)
+    db.session.delete(conference)
+    db.session.commit()
+    # return render_template("EntriesPage.html", journals=JOURNALS.query.all(), conferences=CONFERENCE.query.all())
+    return redirect(url_for('entries'))
+
+
+@app.route('/delete_journal/<string:journal_doi>')
+def delete_journal(journal_doi):
+    journal = JOURNALS.query.get(journal_doi)
+    db.session.delete(journal)
+    db.session.commit()
+    return redirect(url_for('entries'))
 
 
 if __name__ == "__main__":
