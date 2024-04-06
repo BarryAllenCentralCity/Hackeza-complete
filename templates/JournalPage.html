@@ -60,11 +60,16 @@
     <div class = "container">
         
         <section id="journal-section">
+            {% if IsEdit==False %}
             <form action="/journal" method="post">
+                {% else %}
+                <form action="/edit_journal/{{journal.j_doi}}" method="post">
+                {% endif %}
+
                 <h1 style="text-align: center;">Journal Details</h1>
                 <div class="form-group">
                     <label for="publication-date">Date of Publication:</label>
-                    <input type="date" id="publication-date" name="publication-date" class="form-control"><br>
+                    <input type="date" id="publication-date" name="publication-date" class="form-control" value="{{journal.j_dop}}"><br>
                 </div>
 
                 <div class="form-group">
@@ -77,62 +82,62 @@
 
                 <div class="form-group">
                     <label for="ranking">Ranking:</label>
-                    <input type="text" id="ranking" name="ranking" class="form-control"><br>
+                    <input type="text" id="ranking" name="ranking" class="form-control" value="{{journal.j_ranking}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="broad-area">Broad Area:</label>
-                    <input type="text" id="broad-area" name="broad-area" class="form-control"><br>
+                    <input type="text" id="broad-area" name="broad-area" class="form-control" value="{{journal.j_broad_area}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="paper-title">Title of the Paper:</label>
-                    <input type="text" id="paper-title" name="paper-title" class="form-control"><br>
+                    <input type="text" id="paper-title" name="paper-title" class="form-control" value="{{journal.j_pap_tit}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="conference-name">Conference Name (if applicable):</label>
-                    <input type="text" id="conference-name" name="conference-name" class="form-control"><br>
+                    <input type="text" id="conference-name" name="conference-name" class="form-control" value="{{journal.j_con_name}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="impact-factor">Impact Factor:</label>
-                    <input type="text" id="impact-factor" name="impact-factor" class="form-control"><br>
+                    <input type="text" id="impact-factor" name="impact-factor" class="form-control" value="{{journal.j_impf}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="conference-location">Conference Location:</label>
-                    <input type="text" id="conference-location" name="conference-location" class="form-control"><br>
+                    <input type="text" id="conference-location" name="conference-location" class="form-control" value="uohef"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="volume">Volume:</label>
-                    <input type="text" id="volume" name="volume" class="form-control"><br>
+                    <input type="text" id="volume" name="volume" class="form-control" value="{{journal.j_volume}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="issue">Issue:</label>
-                    <input type="text" id="issue" name="issue" class="form-control"><br>
+                    <input type="text" id="issue" name="issue" class="form-control" value="{{journal.j_issue}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="page-numbers">Page Numbers:</label>
-                    <input type="text" id="page-numbers" name="page-numbers" class="form-control"><br>
+                    <input type="text" id="page-numbers" name="page-numbers" class="form-control" value="{{journal.j_page_n}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="doi">DOI:</label>
-                    <input type="text" id="doi" name="doi" class="form-control"><br>
+                    <input type="text" id="doi" name="doi" class="form-control" value="{{journal.j_doi}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="publisher">Publisher:</label>
-                    <input type="text" id="publisher" name="publisher" class="form-control"><br>
+                    <input type="text" id="publisher" name="publisher" class="form-control" value="{{journal.j_publisher}}"><br>
                 </div>
 
                 <div class="form-group">
                     <label for="authors">Authors:</label>
-                    <textarea id="authors" name="authors" class="form-control"></textarea><br>
+                    <textarea id="authors" name="authors" class="form-control">{{journal.j_authors}}</textarea><br>
                 </div>
                 
                 <input type="submit" class="btn btn-primary" value="SAVE">
