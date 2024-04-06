@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Journal Entries</title>
+    <style>
+        #button {
+            margin-top: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Journal Entries</h1>
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th>Date</th>
+                            <td>{{journal.j_dop}}</td>
+                        </tr>
+                        <tr>
+                            <th>National/International</th>
+                            <td>{{journal.j_nat_inat}}</td>
+                        </tr>
+                        <tr>
+                            <th>Ranking</th>
+                            <td>{{journal.j_ranking}}</td>
+                        </tr>
+                        <tr>
+                            <th>Broad Area</th>
+                            <td>{{journal.j_broad_area}}</td>
+                        </tr>
+                        <tr>
+                            <th>Title</th>
+                            <td>{{journal.j_pap_tit}}</td>
+                        </tr>
+                        <tr>
+                            <th>Conference Name</th>
+                            <td>{{journal.j_con_name}}</td>
+                        </tr>
+                        <tr>
+                            <th>Impact Factor</th>
+                            <td>{{journal.j_impf}}</td>
+                        </tr>
+                        <tr>
+                            <th>Conference Location</th>
+                            <td>JAHANUM</td>
+                        </tr>
+                        <tr>
+                            <th>Volume</th>
+                            <td>{{journal.j_volume}}</td>
+                        </tr>
+                        <tr>
+                            <th>Issue</th>
+                            <td>{{journal.j_issue}}</td>
+                        </tr>
+                        <tr>
+                            <th>Page Numbers</th>
+                            <td>{{journal.j_page_n}}</td>
+                        </tr>
+                        <tr>
+                            <th>DOI</th>
+                            <td>{{journal.j_doi}}</td>
+                        </tr>
+                        <tr>
+                            <th>Publisher</th>
+                            <td>{{journal.j_publisher}}</td>
+                        </tr>
+                        <tr>
+                            <th>Authors</th>
+                            <td>{{journal.j_authors}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="button" class="row">
+            <div class="col">
+                <button style="margin-right: 10px; width:15%" class="btn btn-primary">Edit</button>
+                <button style="width: 15%;" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
