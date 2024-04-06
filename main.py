@@ -11,15 +11,17 @@ db = SQLAlchemy()
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///our_data.db"
 db.init_app(app)
 
+login_id = ""
+
 
 class USER_DETAIL(db.Model):
-    _tablename_ = "user_detail"
+    __tablename__ = "user_detail"
     email = db.Column(db.String(120), unique=True, nullable=False, primary_key=True)
     roles = db.Column(db.String(120), nullable=False)
 
 
 class JOURNALS(db.Model):
-    _tablename_ = "journals"
+    __tablename__ = "journals"
     j_email = db.Column(db.String(120), nullable=False)
     j_dop = db.Column(db.String(20), nullable=False)
     j_nat_inat = db.Column(db.String(120), nullable=False)
@@ -34,11 +36,11 @@ class JOURNALS(db.Model):
     j_issue = db.Column(db.String(120), nullable=False)
     j_page_n = db.Column(db.String(120), nullable=False)
     j_publisher = db.Column(db.String(120), nullable=False)
-    j_con_loc = db.Column(db.String(120), nullable=False)
+    #j_con_loc = db.Column(db.String(120), nullable=False)
 
 
 class CONFERENCE(db.Model):
-    _tablename_ = "conference"
+    __tablename__ = "conference"
     c_email = db.Column(db.String(120), nullable=False)
     c_date = db.Column(db.Integer, nullable=False)
     c_nat = db.Column(db.String(120), nullable=False)
@@ -47,7 +49,7 @@ class CONFERENCE(db.Model):
     c_short_name = db.Column(db.String(120), nullable=False)
     c_con_location = db.Column(db.String(120), nullable=False)
     c_full_name = db.Column(db.String(120), nullable=False)
-    c_url = db.Column(db.String(120), nullable=False, primary_key=True)
+    c_url = db.Column(db.String(120), nullable=False,primary_key=True)
     c_authors = db.Column(db.String(200), nullable=False)
     c_volume = db.Column(db.String(120), nullable=False)
     c_issue = db.Column(db.String(120), nullable=False)
@@ -71,14 +73,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         # Process the form data here
-        the_user = USER_DETAIL.query.filter_by(email=form.email.data).first()
-        
-
-        
-
-
-        # print(form.email.data)
-        # print(form.password.data)
+        print(form.email.data)
+        login_id = form.email.data
+        print(form.password.data)
 
         ##check in the data base##
 
@@ -99,6 +96,10 @@ def home_page():
 
 @app.route('/admin')
 def admin_page():
+    # taking in all the journal entries
+
+    ##
+
     return render_template("AdminPage.html")
 
 
@@ -110,8 +111,23 @@ def admin_pub_page():
 @app.route('/entries')
 def entries():
     journals = JOURNALS.query.all()
-    conferences = CONFERENCE.query.all()
+    if journals:
+        for journal in journals:
+            print(journal.j_email)
+            print(journal.j_con_name)
+    else:
+        print("NOTHING HERE")
+    #####
 
+    # taking in all the conference entries
+
+    conferences = CONFERENCE.query.all()
+    if conferences:
+        for conference in conferences:
+            print(conference.c_email)
+            print(conference.c_nat)
+    else:
+        print("nothing here")
     return render_template("EntriesPage.html", journals=journals, conferences=conferences)
 
 
@@ -142,7 +158,6 @@ def journal_page():
         doi = request.form['doi']
         publisher = request.form['publisher']
         authors = request.form['authors']
-        
 
         # Process the form data here, you can save it to database or perform other actions
         # For now, let's just print the values
@@ -161,7 +176,7 @@ def journal_page():
         # print(f"Publisher: {publisher}")
         # print(f"Authors: {authors}")
         new_journal = JOURNALS(
-            j_email="j_email",
+            j_email=login_id,
             j_dop=publication_date,
             j_nat_inat=national_international,
             j_ranking=ranking,
@@ -175,7 +190,7 @@ def journal_page():
             j_issue=issue,
             j_page_n=page_numbers,
             j_publisher=publisher,
-            j_con_loc = conference_location
+            #j_con_loc=conference_location
         )
 
         # Add the new_journal to the database session
@@ -184,14 +199,14 @@ def journal_page():
         # Commit the changes to persist them in the database
         db.session.commit()
         return "<h1>Entry done</h1>"
-    return render_template("JournalPage.html")
+    return render_template("JournalPage.html", journal=None)
 
 
 @app.route('/conference', methods=["GET", "POST"])
 def conference():
-    if request.method == "POST":
+    if request.method == 'POST':
         # Extract form data
-        c_email = "c_mail"
+        c_email = "maillll"
         c_date = request.form['conference-date']
         c_nat = request.form['type']
         c_corerank = request.form['corerank']
@@ -231,20 +246,29 @@ def conference():
     return render_template("ConferencePage.html")
 
 
-@app.route('/publication_edit')
-def pub_edit_page():
-    return render_template("PublicationEditPage.html")
+@app.route('/edit_journal/<string:journal_doi>')
+def edit_journal(journal_doi):
+    journal = JOURNALS.query.get(journal_doi)
+    #return "<h1>EDIT ME AAGYE</h1>"
+    return render_template("JournalPage.html", journal=journal)
+
 
 @app.route('/show_entry/<string:journal_doi>')
 def show_entry(journal_doi):
     journal = JOURNALS.query.get(journal_doi)
-    return render_template("ShowJournalPage.html", journal = journal)
+    return render_template("ShowJournalPage.html", journal=journal)
+
 
 @app.route('/show_conf_entry/<string:conf_url>')
 def show_conf_entry(conf_url):
     conference = CONFERENCE.query.get(conf_url)
-    return render_template("ShowConferencePage.html", conference = conference)
+    return render_template("ShowConferencePage.html", conference=conference)
 
+@app.route('/edit_conference/<string:conf_url>')
+def edit_conference(conf_url):
+    conference = CONFERENCE.query.get(conf_url)
+    #return "<h1>EDIT ME AAGYE</h1>"
+    return render_template("ConferencePage.html", conference=conference)
 
 if __name__ == "__main__":
     app.run(debug=True)
