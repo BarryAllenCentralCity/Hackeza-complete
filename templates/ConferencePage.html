@@ -57,71 +57,75 @@
 
     <div class="container">
         <section id="conference-section">
+            {% if IsEdit==False %}
             <form action="/conference" method="post">
+                {% else %}
+                <form action="/edit_conference/{{conference.c_url}}" method="post">
+                    {% endif %}
                 <h1 style="text-align: center;">Conference Details</h1>
                 <div class="form-group">
                     <label for="conference-date">Date of Conference:</label>
-                    <input type="date" id="conference-date" name="conference-date" class="form-control"><br>
+                    <input type="date" id="conference-date" name="conference-date" class="form-control" value="{{conference.c_date}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="type">National/International:</label>
-                    <input type="text" class="form-control" id="type" name="type"><br>
+                    <input type="text" class="form-control" id="type" name="type" value="{{conference.c_nat}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="corerank">Corerank:</label>
-                    <input type="text" class="form-control" id="corerank" name="corerank"><br>
+                    <input type="text" class="form-control" id="corerank" name="corerank" value="{{conference.c_corerank}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="title">Paper Title:</label>
-                    <input type="text" class="form-control" id="title" name="title"><br>
+                    <input type="text" class="form-control" id="title" name="title" value="{{conference.c_pap_tit}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="shortname">Shortname:</label>
-                    <input type="text" class="form-control" id="shortname" name="shortname"><br>
+                    <input type="text" class="form-control" id="shortname" name="shortname" value="{{conference.c_short_name}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="fullname">Fullname:</label>
-                    <input type="text" class="form-control" id="fullname" name="fullname"><br>
+                    <input type="text" class="form-control" id="fullname" name="fullname" value="{{conference.c_full_name}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="location">Conference Location:</label>
-                    <input type="text" class="form-control" id="location" name="location"><br>
+                    <input type="text" class="form-control" id="location" name="location" value="{{conference.c_con_location}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="volume">Volume:</label>
-                    <input type="text" class="form-control" id="volume" name="volume"><br>
+                    <input type="text" class="form-control" id="volume" name="volume" value="{{conference.c_volume}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="issue">Issue:</label>
-                    <input type="text" class="form-control" id="issue" name="issue"><br>
+                    <input type="text" class="form-control" id="issue" name="issue" value="{{conference.c_issue}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="pages">Page numbers:</label>
-                    <input type="text" class="form-control" id="pages" name="pages"><br>
+                    <input type="text" class="form-control" id="pages" name="pages" value="{{conference.c_page_n}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="url">URL:</label>
-                    <input type="text" class="form-control" id="url" name="url"><br>
+                    <input type="text" class="form-control" id="url" name="url" value="{{conference.c_url}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="publisher">Publisher:</label>
-                    <input type="text" class="form-control" id="publisher" name="publisher"><br>
+                    <input type="text" class="form-control" id="publisher" name="publisher" value="{{conference.c_publisher}}"><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="authors">Authors:</label>
-                    <input type="text" class="form-control" id="authors" name="authors"><br>
+                    <input type="text" class="form-control" id="authors" name="authors" value="{{conference.c_authors}}"><br>
                 </div>
                 
                 <input type="submit" class="btn btn-primary" value="SAVE">
