@@ -40,7 +40,7 @@ class JOURNALS(db.Model):
 class CONFERENCE(db.Model):
     _tablename_ = "conference"
     c_email = db.Column(db.String(120), nullable=False)
-    c_date = db.Column(db.Integer, primary_key=True)
+    c_date = db.Column(db.Integer, nullable=False)
     c_nat = db.Column(db.String(120), nullable=False)
     c_corerank = db.Column(db.Integer, nullable=False)
     c_pap_tit = db.Column(db.String(120), nullable=False)
@@ -109,7 +109,10 @@ def admin_pub_page():
 
 @app.route('/entries')
 def entries():
-    return render_template("EntriesPage.html")
+    journals = JOURNALS.query.all()
+    conferences = CONFERENCE.query.all()
+
+    return render_template("EntriesPage.html", journals=journals, conferences=conferences)
 
 
 @app.route('/publication', methods=['GET', 'POST'])
@@ -231,6 +234,16 @@ def conference():
 @app.route('/publication_edit')
 def pub_edit_page():
     return render_template("PublicationEditPage.html")
+
+@app.route('/show_entry/<string:journal_doi>')
+def show_entry(journal_doi):
+    journal = JOURNALS.query.get(journal_doi)
+    return render_template("ShowJournalPage.html", journal = journal)
+
+@app.route('/show_conf_entry/<string:conf_url>')
+def show_conf_entry(conf_url):
+    conference = CONFERENCE.query.get(conf_url)
+    return render_template("ShowConferencePage.html", conference = conference)
 
 
 if __name__ == "__main__":
