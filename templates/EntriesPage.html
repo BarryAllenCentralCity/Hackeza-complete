@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entries Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("static/bg.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .column {
+            float: left;
+            width: 40%;
+            margin: 200px 30px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #lists {
+            display: flex;
+            justify-content: center;
+        }
+        img{
+            width: 250px;
+            height: 80px;
+        }
+        .list-tile {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        #title{
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <img class="logo" src="static/logo.png" alt="logo">
+        <a class="navbar-brand" href="#">CSIS department</a>
+    </nav>
+    <section id="lists">
+    <div class="column">
+        <p class="container" id="title">Journals</p>
+        <ul class="container">
+            {% for journal in journals %}
+            <li class="list-tile"><a href="{{ url_for('show_entry', journal_doi=journal.j_doi) }}" style="color:red;"><b>{{ journal.j_pap_tit }}</b></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="column">
+        <p class="container" id="title">Conferences</p>
+        <ul class="container">
+            {% for conference in conferences %}
+            <li class="list-tile"><a href="#" style="color:red;"><b>{{ conference.c_pap_tit }}</b></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    </div>
+    </section>
+</body>
+</html>
