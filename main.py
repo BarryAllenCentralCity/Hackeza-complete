@@ -1,3 +1,4 @@
+import os
 import smtplib
 
 from flask import Flask, render_template, redirect, url_for, request
@@ -14,8 +15,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///our_data.db"
 db.init_app(app)
 
 login_id = ""
-MY_EMAIL = "44bantai@gmail.com"
-PASSWORD = "vsmqcdoteyqchkwq"
+ADMIN_EMAIL = os.environ.get('email')
+PASSWORD = os.environ.get('password')
 
 
 class USER_DETAIL(db.Model):
@@ -337,9 +338,9 @@ def send_email():
             all_users.append(user.email)
     with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
         connection.starttls()
-        connection.login(user=MY_EMAIL, password=PASSWORD)
+        connection.login(user=ADMIN_EMAIL, password=PASSWORD)
         for email in all_users:
-            connection.sendmail(from_addr=MY_EMAIL, to_addrs=email,
+            connection.sendmail(from_addr=ADMIN_EMAIL, to_addrs=email,
                                 msg=f"Subject:Regarding Journal or Conference Entry.\n\nPlease complete your entry in the portal to the earliest.")
     return redirect(url_for('admin_page'))
 
