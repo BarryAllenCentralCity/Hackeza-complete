@@ -52,12 +52,15 @@
 <body>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="HomePage.html"><img class="logo" src="static/logo.png" alt="logo"></a>
-        <a class="navbar-brand" href="#">CSIS department</a>
+        <a class="navbar-brand" style="font-size: 25px; font-family: fantasy;" href="#">CSIS department</a>
+        <a class="navbar-brand button" style="width: 15%; margin-right: 15px;" href="{{ url_for('admin_page') }}">Home</a>
+
     </nav>
     <div class="container">
         <a href="{{ url_for('entries') }}" class="button">Modify Entries</a>
-        <a href="#" class="button">Print</a>
-        <a href="#" class="button">Send Email</a>
+        <a href ="{{url_for('generate_pdf_file_journal')}}"class="button">Print Journals</a>
+        <a href ="{{url_for('generate_pdf_file_conference')}}"class="button">Print Conference</a>
+        <a href="{{url_for('send_email')}}" class="button">Send Email</a>
     </div>
 </body>
 </html>

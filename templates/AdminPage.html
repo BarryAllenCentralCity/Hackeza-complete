@@ -46,7 +46,9 @@
 <body>
   <nav class="navbar navbar-light bg-light">
     <a class="navbar-brand" href="HomePage.html"><img class="logo" src="static/logo.png" alt="logo"></a>
-    <a class="navbar-brand" href="#">CSIS department</a>
+    <a class="navbar-brand" style="font-size: 25px; font-family: fantasy;" href="#">CSIS department</a>
+    <a class="navbar-brand button" style="width: 15%; margin-right: 15px;" href="{{ url_for('admin_page') }}">Home</a>
+
 </nav>
   <div class="container">
     <a href="{{ url_for('admin_pub_page') }}">

@@ -46,16 +46,35 @@
             font-size: 20px;
             font-weight: bold;
         }
+        .button {
+            display: block;
+            padding: 10px 20px;
+            width: 70%;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: auto; /* Add this line to center align the buttons horizontally */
+            margin-right: auto; /* Add this line to center align the buttons horizontally */
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-light bg-light">
         <img class="logo" src="static/logo.png" alt="logo">
-        <a class="navbar-brand" href="#">CSIS department</a>
+        <a class="navbar-brand" style="font-size: 25px; font-family: fantasy;" href="#">CSIS department</a>
+        <a class="navbar-brand button" style="width: 15%; margin-right: 15px;" href="{{ url_for('admin_page') }}">Home</a>
+
     </nav>
     <section id="lists">
     <div class="column">
-        <p class="container" id="title">Journals</p>
+        <p class="container" id="title">Journals (title)</p>
         <ul class="container">
             {% for journal in journals %}
             <li class="list-tile"><a href="{{ url_for('show_entry', journal_doi=journal.j_doi) }}" style="color:red;"><b>{{ journal.j_pap_tit }}</b></a></li>
@@ -63,7 +82,7 @@
         </ul>
     </div>
     <div class="column">
-        <p class="container" id="title">Conferences</p>
+        <p class="container" id="title">Conferences (title)</p>
         <ul class="container">
             {% for conference in conferences %}
             <li class="list-tile"><a href="{{ url_for('show_conf_entry', conf_url=conference.c_url) }}" style="color:red;"><b>{{ conference.c_pap_tit }}</b></a></li>

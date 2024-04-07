@@ -1,10 +1,16 @@
 import os
 import smtplib
 
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request ,send_file
 from forms import LoginForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -15,8 +21,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///our_data.db"
 db.init_app(app)
 
 login_id = ""
-ADMIN_EMAIL = os.environ.get('email')
-PASSWORD = os.environ.get('password')
+ADMIN_EMAIL = "44bantai@gmail.com"
+PASSWORD = "vsmqcdoteyqchkwq"
 
 
 class USER_DETAIL(db.Model):
@@ -179,7 +185,7 @@ def journal_page():
         authors = request.form['authors']
 
         new_journal = JOURNALS(
-            j_email=login_id,
+            j_email="maillll",
             j_dop=publication_date,
             j_nat_inat=national_international,
             j_ranking=ranking,
@@ -201,7 +207,7 @@ def journal_page():
 
         # Commit the changes to persist them in the database
         db.session.commit()
-        return "<h1>Entry done</h1>"
+        return redirect(url_for('home_page'))
     return render_template("JournalPage.html", journal=None, IsEdit=False)
 
 
@@ -245,7 +251,7 @@ def conference():
 
         # Commit the session to persist the changes
         db.session.commit()
-        return "<h1>Confrerece entry done</h1>"
+        return redirect(url_for('home_page'))
     return render_template("ConferencePage.html", conference=None, IsEdit=False)
 
 
@@ -344,6 +350,106 @@ def send_email():
                                 msg=f"Subject:Regarding Journal or Conference Entry.\n\nPlease complete your entry in the portal to the earliest.")
     return redirect(url_for('admin_page'))
 
+
+def fetch_data_j():
+    user_data_journals = JOURNALS.query.all()
+    return user_data_journals
+
+# Function to generate PDF
+@app.route('/generate-pdf-journal', methods=['GET', 'POST'])
+def generate_pdf_file_journal():
+    # Fetch data from the database
+    
+        data = fetch_data_j()
+
+    # Create a PDF document
+        pdf_filename = "journals.pdf"
+        doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+
+    # Define the column headers
+        headers = ['DOI', 'Nat/Inat', 'Ranking', 'Broad Area',
+               'Con_Name', 'Imp_F', 'Pap_Title', 'DOP', 'Authors',
+               'Volume', 'Issue', 'Page_n', 'Publisher', 'Con_Loc']
+
+    # Define table data including headers and fetched data
+        table_data = [[header] for header in headers]
+        for journal in data:
+            for i, attribute in enumerate([journal.j_doi, journal.j_nat_inat, journal.j_ranking,
+                                       journal.j_broad_area, journal.j_con_name, journal.j_impf,
+                                       journal.j_pap_tit, journal.j_dop, journal.j_authors,
+                                       journal.j_volume, journal.j_issue, journal.j_page_n,
+                                       journal.j_publisher, journal.j_con_loc]):
+                table_data[i].append(attribute)
+
+    # Create a table and style
+        table = Table(table_data)
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+    # Apply the style to the table
+        table.setStyle(style)
+
+    # Add the table to the PDF document
+        elements = [table]
+        doc.build(elements)
+
+        return send_file("journals.pdf", as_attachment=True)
+   
+
+    
+def fetch_data_c():
+    user_data_conference = CONFERENCE.query.all()
+    return user_data_conference
+
+
+@app.route('/generate-pdf-conference', methods=['GET', 'POST'])
+def generate_pdf_file_conference():
+    # Fetch data from the database
+    
+        data = fetch_data_c()
+
+    # Create a PDF document
+        pdf_filename = "conference.pdf"
+        doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+
+    # Define the column headers
+        headers = ['Date', 'Nat/Inat', 'CoreRank', 'Short Name',
+               'Con_Location', 'Full Name', 'Pap_Title', 'URL', 'Authors',
+               'Volume', 'Issue', 'Page_n', 'Publisher', 'Con_Loc']
+
+    # Define table data including headers and fetched data
+        table_data = [[header] for header in headers]
+        for conf in data:
+            for i, attribute in enumerate([conf.c_date, conf.c_nat, conf.c_corerank,
+                                       conf.c_short_name, conf.c_con_location, conf.c_full_name,
+                                       conf.c_pap_tit, conf.c_url, conf.c_authors,
+                                       conf.c_volume, conf.c_issue, conf.c_page_n,
+                                       conf.c_publisher, conf.c_con_location]):
+                table_data[i].append(attribute)
+
+    # Create a table and style
+        table = Table(table_data)
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+    # Apply the style to the table
+        table.setStyle(style)
+
+    # Add the table to the PDF document
+        elements = [table]
+        doc.build(elements)
+
+        return send_file("conference.pdf", as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
