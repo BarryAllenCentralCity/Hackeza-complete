@@ -1,7 +1,16 @@
-from flask import Flask, render_template, redirect, url_for, request
+import os
+import smtplib
+
+from flask import Flask, render_template, redirect, url_for, request ,send_file
 from forms import LoginForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
@@ -11,15 +20,19 @@ db = SQLAlchemy()
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///our_data.db"
 db.init_app(app)
 
+login_id = ""
+ADMIN_EMAIL = "44bantai@gmail.com"
+PASSWORD = "vsmqcdoteyqchkwq"
+
 
 class USER_DETAIL(db.Model):
-    _tablename_ = "user_detail"
+    __tablename__ = "user_detail"
     email = db.Column(db.String(120), unique=True, nullable=False, primary_key=True)
     roles = db.Column(db.String(120), nullable=False)
 
 
 class JOURNALS(db.Model):
-    _tablename_ = "journals"
+    __tablename__ = "journals"
     j_email = db.Column(db.String(120), nullable=False)
     j_dop = db.Column(db.String(20), nullable=False)
     j_nat_inat = db.Column(db.String(120), nullable=False)
@@ -38,7 +51,7 @@ class JOURNALS(db.Model):
 
 
 class CONFERENCE(db.Model):
-    _tablename_ = "conference"
+    __tablename__ = "conference"
     c_email = db.Column(db.String(120), nullable=False)
     c_date = db.Column(db.Integer, nullable=False)
     c_nat = db.Column(db.String(120), nullable=False)
@@ -72,10 +85,19 @@ def login():
     if form.validate_on_submit():
         # Process the form data here
         the_user = USER_DETAIL.query.filter_by(email=form.email.data).first()
-        
 
-        
+        if the_user:
 
+            if the_user.roles == 'admin':
+                return redirect(url_for('admin_page'))
+
+            else:
+                return redirect(url_for('home_page'))
+
+
+        else:
+
+            return redirect(url_for('unauthorized'))
 
         # print(form.email.data)
         # print(form.password.data)
@@ -86,7 +108,7 @@ def login():
         # if admin then pass then
         # return redirect(url_for('admin_page'))
         # else
-        return redirect(url_for('home_page'))
+
         # else add the user in the database----------ye alag se function hoga...
         # else show unauthorised access
     return render_template('login.html', form=form)
@@ -99,6 +121,10 @@ def home_page():
 
 @app.route('/admin')
 def admin_page():
+    # taking in all the journal entries
+
+    ##
+
     return render_template("AdminPage.html")
 
 
@@ -110,8 +136,23 @@ def admin_pub_page():
 @app.route('/entries')
 def entries():
     journals = JOURNALS.query.all()
-    conferences = CONFERENCE.query.all()
+    if journals:
+        for journal in journals:
+            print(journal.j_email)
+            print(journal.j_con_name)
+    else:
+        print("NOTHING HERE")
+    #####
 
+    # taking in all the conference entries
+
+    conferences = CONFERENCE.query.all()
+    if conferences:
+        for conference in conferences:
+            print(conference.c_email)
+            print(conference.c_nat)
+    else:
+        print("nothing here")
     return render_template("EntriesPage.html", journals=journals, conferences=conferences)
 
 
@@ -142,26 +183,9 @@ def journal_page():
         doi = request.form['doi']
         publisher = request.form['publisher']
         authors = request.form['authors']
-        
 
-        # Process the form data here, you can save it to database or perform other actions
-        # For now, let's just print the values
-        # print(f"Publication Date: {publication_date}")
-        # print(f"National/International: {national_international}")
-        # print(f"Ranking: {ranking}")
-        # print(f"Broad Area: {broad_area}")
-        # print(f"Paper Title: {paper_title}")
-        # print(f"Conference Name: {conference_name}")
-        # print(f"Impact Factor: {impact_factor}")
-        # print(f"Conference Location: {conference_location}")
-        # print(f"Volume: {volume}")
-        # print(f"Issue: {issue}")
-        # print(f"Page Numbers: {page_numbers}")
-        # print(f"DOI: {doi}")
-        # print(f"Publisher: {publisher}")
-        # print(f"Authors: {authors}")
         new_journal = JOURNALS(
-            j_email="j_email",
+            j_email="maillll",
             j_dop=publication_date,
             j_nat_inat=national_international,
             j_ranking=ranking,
@@ -175,7 +199,7 @@ def journal_page():
             j_issue=issue,
             j_page_n=page_numbers,
             j_publisher=publisher,
-            j_con_loc = conference_location
+            j_con_loc=conference_location
         )
 
         # Add the new_journal to the database session
@@ -183,15 +207,15 @@ def journal_page():
 
         # Commit the changes to persist them in the database
         db.session.commit()
-        return "<h1>Entry done</h1>"
-    return render_template("JournalPage.html")
+        return redirect(url_for('home_page'))
+    return render_template("JournalPage.html", journal=None, IsEdit=False)
 
 
 @app.route('/conference', methods=["GET", "POST"])
 def conference():
-    if request.method == "POST":
+    if request.method == 'POST':
         # Extract form data
-        c_email = "c_mail"
+        c_email = "maillll"
         c_date = request.form['conference-date']
         c_nat = request.form['type']
         c_corerank = request.form['corerank']
@@ -227,24 +251,205 @@ def conference():
 
         # Commit the session to persist the changes
         db.session.commit()
-        return "<h1>Confrerece entry done</h1>"
-    return render_template("ConferencePage.html")
+        return redirect(url_for('home_page'))
+    return render_template("ConferencePage.html", conference=None, IsEdit=False)
 
-
-@app.route('/publication_edit')
-def pub_edit_page():
-    return render_template("PublicationEditPage.html")
 
 @app.route('/show_entry/<string:journal_doi>')
 def show_entry(journal_doi):
     journal = JOURNALS.query.get(journal_doi)
-    return render_template("ShowJournalPage.html", journal = journal)
+    return render_template("ShowJournalPage.html", journal=journal)
+
 
 @app.route('/show_conf_entry/<string:conf_url>')
 def show_conf_entry(conf_url):
     conference = CONFERENCE.query.get(conf_url)
-    return render_template("ShowConferencePage.html", conference = conference)
+    return render_template("ShowConferencePage.html", conference=conference)
 
+
+@app.route('/edit_journal/<string:journal_doi>', methods=['GET', 'POST'])
+def edit_journal(journal_doi):
+    journal = JOURNALS.query.get(journal_doi)
+    # return "<h1>EDIT ME AAGYE</h1>"
+    if request.method == 'POST':
+        journal.j_dop = request.form['publication-date']
+        journal.j_nat_inat = request.form['national-international']
+        journal.j_ranking = request.form['ranking']
+        journal.j_broad_area = request.form['broad-area']
+        journal.j_pap_tit = request.form['paper-title']
+        journal.j_con_name = request.form['conference-name']
+        journal.j_impf = request.form['impact-factor']
+        journal.j_volume = request.form['volume']
+        journal.j_issue = request.form['issue']
+        journal.j_page_n = request.form['page-numbers']
+        journal.j_publisher = request.form['publisher']
+        journal.j_authors = request.form['authors']
+
+        # Commit the changes to the database
+        db.session.commit()
+        return redirect(url_for('admin_pub_page'))
+    return render_template("JournalPage.html", journal=journal, IsEdit=True)
+
+
+@app.route('/edit_conference/<string:conf_url>', methods=['GET', 'POST'])
+def edit_conference(conf_url):
+    conference = CONFERENCE.query.get(conf_url)
+    # return "<h1>EDIT ME AAGYE</h1>"
+    if request.method == 'POST':
+        conference.c_email = "maillll"
+        conference.c_date = request.form['conference-date']
+        conference.c_nat = request.form['type']
+        conference.c_corerank = request.form['corerank']
+        conference.c_pap_tit = request.form['title']
+        conference.c_short_name = request.form['shortname']
+        conference.c_con_location = request.form['location']
+        conference.c_full_name = request.form['fullname']
+        conference.c_url = request.form['url']
+        conference.c_authors = request.form['authors']
+        conference.c_volume = request.form['volume']
+        conference.c_issue = request.form['issue']
+        conference.c_page_n = request.form['pages']
+        conference.c_publisher = request.form['publisher']
+
+        # Commit the changes to the database
+        db.session.commit()
+        return redirect(url_for('admin_pub_page'))
+
+    return render_template("ConferencePage.html", conference=conference, IsEdit=True)
+
+
+@app.route('/delete_conference/<string:conf_url>')
+def delete_conference(conf_url):
+    conference = CONFERENCE.query.get(conf_url)
+    db.session.delete(conference)
+    db.session.commit()
+    return redirect(url_for('entries'))
+
+
+@app.route('/delete_journal/<string:journal_doi>')
+def delete_journal(journal_doi):
+    journal = JOURNALS.query.get(journal_doi)
+    db.session.delete(journal)
+    db.session.commit()
+    return redirect(url_for('entries'))
+
+
+@app.route('/send_mail')
+def send_email():
+    all_users = []
+    total_users = USER_DETAIL.query.all()
+    for user in total_users:
+        if user.roles != 'admin':
+            print(user.email)
+            all_users.append(user.email)
+    with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+        connection.starttls()
+        connection.login(user=ADMIN_EMAIL, password=PASSWORD)
+        for email in all_users:
+            connection.sendmail(from_addr=ADMIN_EMAIL, to_addrs=email,
+                                msg=f"Subject:Regarding Journal or Conference Entry.\n\nPlease complete your entry in the portal to the earliest.")
+    return redirect(url_for('admin_page'))
+
+
+def fetch_data_j():
+    user_data_journals = JOURNALS.query.all()
+    return user_data_journals
+
+# Function to generate PDF
+@app.route('/generate-pdf-journal', methods=['GET', 'POST'])
+def generate_pdf_file_journal():
+    # Fetch data from the database
+    
+        data = fetch_data_j()
+
+    # Create a PDF document
+        pdf_filename = "journals.pdf"
+        doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+
+    # Define the column headers
+        headers = ['DOI', 'Nat/Inat', 'Ranking', 'Broad Area',
+               'Con_Name', 'Imp_F', 'Pap_Title', 'DOP', 'Authors',
+               'Volume', 'Issue', 'Page_n', 'Publisher', 'Con_Loc']
+
+    # Define table data including headers and fetched data
+        table_data = [[header] for header in headers]
+        for journal in data:
+            for i, attribute in enumerate([journal.j_doi, journal.j_nat_inat, journal.j_ranking,
+                                       journal.j_broad_area, journal.j_con_name, journal.j_impf,
+                                       journal.j_pap_tit, journal.j_dop, journal.j_authors,
+                                       journal.j_volume, journal.j_issue, journal.j_page_n,
+                                       journal.j_publisher, journal.j_con_loc]):
+                table_data[i].append(attribute)
+
+    # Create a table and style
+        table = Table(table_data)
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+    # Apply the style to the table
+        table.setStyle(style)
+
+    # Add the table to the PDF document
+        elements = [table]
+        doc.build(elements)
+
+        return send_file("journals.pdf", as_attachment=True)
+   
+
+    
+def fetch_data_c():
+    user_data_conference = CONFERENCE.query.all()
+    return user_data_conference
+
+
+@app.route('/generate-pdf-conference', methods=['GET', 'POST'])
+def generate_pdf_file_conference():
+    # Fetch data from the database
+    
+        data = fetch_data_c()
+
+    # Create a PDF document
+        pdf_filename = "conference.pdf"
+        doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+
+    # Define the column headers
+        headers = ['Date', 'Nat/Inat', 'CoreRank', 'Short Name',
+               'Con_Location', 'Full Name', 'Pap_Title', 'URL', 'Authors',
+               'Volume', 'Issue', 'Page_n', 'Publisher', 'Con_Loc']
+
+    # Define table data including headers and fetched data
+        table_data = [[header] for header in headers]
+        for conf in data:
+            for i, attribute in enumerate([conf.c_date, conf.c_nat, conf.c_corerank,
+                                       conf.c_short_name, conf.c_con_location, conf.c_full_name,
+                                       conf.c_pap_tit, conf.c_url, conf.c_authors,
+                                       conf.c_volume, conf.c_issue, conf.c_page_n,
+                                       conf.c_publisher, conf.c_con_location]):
+                table_data[i].append(attribute)
+
+    # Create a table and style
+        table = Table(table_data)
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+    # Apply the style to the table
+        table.setStyle(style)
+
+    # Add the table to the PDF document
+        elements = [table]
+        doc.build(elements)
+
+        return send_file("conference.pdf", as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True)

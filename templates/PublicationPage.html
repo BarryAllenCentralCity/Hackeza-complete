@@ -52,11 +52,12 @@
 <body>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="HomePage.html"><img class="logo" src="static/logo.png" alt="logo"></a>
-        <a class="navbar-brand" href="#">CSIS department</a>
+        <a class="navbar-brand" style="font-size: 25px; font-family: fantasy;" href="#">CSIS department</a>
+        <a class="navbar-brand button" style="width: 15%; margin-right: 15px;" href="{{ url_for('home_page') }}">Home</a>
     </nav>
     <div class="container">
-        <a href='{{ url_for("journal_page") }}' class="button">Journal</a>
-        <a href='{{ url_for("conference") }}' class="button">Conference</a>
+        <a href='{{ url_for("journal_page") }}' class="button">Add Journal</a>
+        <a href='{{ url_for("conference") }}' class="button">Add Conference</a>
     </div>
 </body>
 </html>
